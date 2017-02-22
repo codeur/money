@@ -17,7 +17,7 @@
   "jep": {
     "priority": 100,
     "iso_code": "JEP",
-    "name": "Jersey Pound",
+    "name": "Livre de Jersey",
     "symbol": "£",
     "disambiguate_symbol": "JEP",
     "alternate_symbols": [],
@@ -33,7 +33,7 @@
   "ggp": {
     "priority": 100,
     "iso_code": "GGP",
-    "name": "Guernsey Pound",
+    "name": "Livre de Guernesey",
     "symbol": "£",
     "disambiguate_symbol": "GGP",
     "alternate_symbols": [],
@@ -49,7 +49,7 @@
   "imp": {
     "priority": 100,
     "iso_code": "IMP",
-    "name": "Isle of Man Pound",
+    "name": "Livre mannoise",
     "symbol": "£",
     "disambiguate_symbol": "IMP",
     "alternate_symbols": ["M£"],
@@ -65,7 +65,7 @@
   "xfu": {
     "priority": 100,
     "iso_code": "XFU",
-    "name": "UIC Franc",
+    "name": "Franc UIC",
     "symbol": "",
     "disambiguate_symbol": "XFU",
     "alternate_symbols": [],
