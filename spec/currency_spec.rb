@@ -3,7 +3,7 @@
 class Money
   describe Currency do
 
-    FOO = '{ "priority": 1, "iso_code": "FOO", "iso_numeric": "840", "name": "United States Dollar", "symbol": "$", "subunit": "Cent", "subunit_to_unit": 1000, "symbol_first": true, "html_entity": "$", "decimal_mark": ".", "thousands_separator": ",", "smallest_denomination": 1 }'
+    FOO = '{ "priority": 1, "iso_code": "FOO", "iso_numeric": "840", "name": "Dollar des États-Unis", "symbol": "$", "subunit": "Cent", "subunit_to_unit": 1000, "symbol_first": true, "html_entity": "$", "decimal_mark": ".", "thousands_separator": ",", "smallest_denomination": 1 }'
 
     def register_foo(opts={})
       foo_attrs = JSON.parse(FOO, :symbolize_names => true)
@@ -176,7 +176,7 @@ class Money
         expect(currency.priority).to              eq 1
         expect(currency.iso_code).to              eq "USD"
         expect(currency.iso_numeric).to           eq "840"
-        expect(currency.name).to                  eq "United States Dollar"
+        expect(currency.name).to                  eq "Dollar des États-Unis"
         expect(currency.decimal_mark).to          eq "."
         expect(currency.separator).to             eq "."
         expect(currency.thousands_separator).to   eq ","
@@ -291,7 +291,7 @@ class Money
 
     describe "#inspect" do
       it "works as documented" do
-        expect(Currency.new(:usd).inspect).to eq %Q{#<Money::Currency id: usd, priority: 1, symbol_first: true, thousands_separator: ,, html_entity: $, decimal_mark: ., name: United States Dollar, symbol: $, subunit_to_unit: 100, exponent: 2, iso_code: USD, iso_numeric: 840, subunit: Cent, smallest_denomination: 1>}
+        expect(Currency.new(:usd).inspect).to eq %Q{#<Money::Currency id: usd, priority: 1, symbol_first: true, thousands_separator: ,, html_entity: $, decimal_mark: ., name: Dollar des États-Unis, symbol: $, subunit_to_unit: 100, exponent: 2, iso_code: USD, iso_numeric: 840, subunit: Cent, smallest_denomination: 1>}
       end
     end
 

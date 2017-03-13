@@ -44,8 +44,8 @@ describe Money::Currency::Heuristics do
     end
 
     it "finds by name" do
-      expect(it.analyze('1900 bulgarian lev')).to eq ['BGN']
-      expect(it.analyze('Swedish Krona')).to eq ['SEK']
+      expect(it.analyze('Lev bulgare')).to eq ['BGN']
+      expect(it.analyze('Couronne suédoise')).to eq ['SEK']
     end
 
     it "Finds several currencies when several match" do
@@ -69,19 +69,19 @@ describe Money::Currency::Heuristics do
     end
 
     it "finds currencies in the middle of a sentence!" do
-      expect(it.analyze('It would be nice to have 10000 Albanian lek by tomorrow!')).to eq ['ALL']
+      expect(it.analyze("Ce serait bien d'avoir 10000 lek albanais demain !")).to eq ['ALL']
     end
 
     it "finds several currencies in the same text!" do
-      expect(it.analyze("10EUR is less than 100:- but really, I want US$1")).to eq ['EUR', 'SEK', 'USD']
+      expect(it.analyze("10EUR c'est moins que 100:- mais vraiment, je veux US$1")).to eq ['EUR', 'SEK', 'USD']
     end
 
     it "find currencies with normal characters in name using unaccent" do
-      expect(it.analyze("10 Nicaraguan Cordoba")).to eq ["NIO"]
+      expect(it.analyze("Cordoba oro nicaraguayen")).to eq ["NIO"]
     end
 
     it "find currencies with special characters in name using unaccent" do
-      expect(it.analyze("10 Nicaraguan Córdoba")).to eq ["NIO"]
+      expect(it.analyze("Córdoba oro nicaraguayen")).to eq ["NIO"]
     end
 
     it "find currencies with special symbols using unaccent" do
@@ -99,7 +99,7 @@ describe Money::Currency::Heuristics do
       expect(it.analyze("ש״ח")).not_to eq []
       expect(it.analyze("元")).not_to eq []
       expect(it.analyze("¢")).not_to eq []
-      expect(it.analyze("£")).not_to eq [] 
+      expect(it.analyze("£")).not_to eq []
       expect(it.analyze("€")).not_to eq []
       expect(it.analyze("¥")).not_to eq []
       expect(it.analyze("د.إ")).not_to eq []
