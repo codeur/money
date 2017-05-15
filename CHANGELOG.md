@@ -1,5 +1,17 @@
 # Changelog
 
+## 6.9.0
+- Extracted heuristics into money-heuristics gem
+
+## 6.8.4
+- Resolving NIO ambiguity with CAD
+- Display the BBD $ symbol before digits
+- Symbol first for NIO and PAB currencies
+
+## 6.8.3
+- Added support for the British Penny (GBX)
+- Fixed LKR currency html_entity symbol
+
 ## 6.8.2
 - Removed subunits for HUF
 - Fixed `#from_amount` accepting `nil` as currency_code
