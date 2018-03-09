@@ -3,7 +3,7 @@ require "money/bank/variable_exchange"
 require "money/bank/single_currency"
 require "money/money/arithmetic"
 require "money/money/constructors"
-require "money/money/formatting"
+require "money/money/formatter"
 
 # "Money is any object or record that is generally accepted as payment for
 # goods and services and repayment of debts in a given socio-economic context
@@ -17,7 +17,6 @@ require "money/money/formatting"
 class Money
   include Comparable
   include Money::Arithmetic
-  include Money::Formatting
   extend Constructors
 
   # Raised when smallest denomination of a currency is not defined
@@ -358,10 +357,10 @@ class Money
             if fraction == ""
               unit
             else
-              "#{unit}#{decimal_mark}#{fraction}"
+              "#{unit}#{currency.decimal_mark}#{fraction}"
             end
           else
-            "#{unit}#{decimal_mark}#{pad_subunit(subunit)}#{fraction}"
+            "#{unit}#{currency.decimal_mark}#{pad_subunit(subunit)}#{fraction}"
           end
 
     fractional < 0 ? "-#{str}" : str
@@ -545,6 +544,32 @@ class Money
     end
   end
 
+  # Creates a formatted price string according to several rules.
+  #
+  # @param [Hash] See Money::Formatter for the list of formatting options
+  #
+  # @return [String]
+  #
+  def format(*rules)
+    Money::Formatter.new(self, *rules).to_s
+  end
+
+  # Returns a thousands separator according to the locale
+  #
+  # @return [String]
+  #
+  def thousands_separator
+    Money::Formatter.new(self, {}).thousands_separator
+  end
+
+  # Returns a decimal mark according to the locale
+  #
+  # @return [String]
+  #
+  def decimal_mark
+    Money::Formatter.new(self, {}).decimal_mark
+  end
+
   private
 
   def as_d(num)
@@ -578,9 +603,7 @@ class Money
   end
 
   def pad_subunit(subunit)
-    cnt = currency.decimal_places
-    padding = "0" * cnt
-    "#{padding}#{subunit}"[-1 * cnt, cnt]
+    subunit.rjust(currency.decimal_places, '0')
   end
 
   def allocations_from_splits(splits)
