@@ -312,8 +312,9 @@ def marshal_dump; end
 The following example implements an `ActiveRecord` store to save exchange rates to a database.
 
 ```ruby
-# DB columns :from[String], :to[String], :rate[Float]
+# rails g model exchange_rate from:string to:string rate:float
 
+# for Rails 5 replace ActiveRecord::Base with ApplicationRecord
 class ExchangeRate < ActiveRecord::Base
   def self.get_rate(from_iso_code, to_iso_code)
     rate = find_by(:from => from_iso_code, :to => to_iso_code)
@@ -413,6 +414,11 @@ If you wish to disable this feature:
 ``` ruby
 Money.use_i18n = false
 ```
+
+## Collection
+
+In case you're working with collections of `Money` instances, have a look at [money-collection](https://github.com/RubyMoney/money-collection)
+for improved performance and accuracy.
 
 ### Troubleshooting
 

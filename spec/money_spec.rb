@@ -591,6 +591,18 @@ YAML
       expect(moneys[1]).to eq Money.us_dollar(3)
     end
 
+    it "handles small splits" do
+      moneys = Money.us_dollar(5).allocate([0.03, 0.07])
+      expect(moneys[0]).to eq Money.us_dollar(2)
+      expect(moneys[1]).to eq Money.us_dollar(3)
+    end
+
+    it "handles large splits" do
+      moneys = Money.us_dollar(5).allocate([3, 7])
+      expect(moneys[0]).to eq Money.us_dollar(2)
+      expect(moneys[1]).to eq Money.us_dollar(3)
+    end
+
     it "does not lose pennies" do
       moneys = Money.us_dollar(100).allocate([0.333, 0.333, 0.333])
       expect(moneys[0].cents).to eq 34
@@ -629,10 +641,6 @@ YAML
         expect(Money.us_dollar(10_00).allocate(ratios).map(&:fractional)).to eq([6_67, 3_33])
         expect(Money.us_dollar(-10_00).allocate(ratios).map(&:fractional)).to eq([-6_67, -3_33])
       end
-    end
-
-    it "requires total to be less then 1" do
-      expect { Money.us_dollar(0.05).allocate([0.5, 0.6]) }.to raise_error(ArgumentError)
     end
 
     it "keeps subclasses intact" do
@@ -731,6 +739,15 @@ YAML
 
         it "preserves the class in the result" do
           expect(rounded).to be_a special_money_class
+        end
+      end
+
+      context "when using a specific rounding precision" do
+        let(:money) { Money.new(15.7526, 'NZD') }
+
+        it "uses the provided rounding precision" do
+          rounded = money.round(BigDecimal::ROUND_DOWN, 3)
+          expect(rounded.fractional).to eq 15.752
         end
       end
     end
