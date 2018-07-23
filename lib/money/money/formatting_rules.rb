@@ -8,9 +8,10 @@ class Money
       # support for old format parameters
       @rules = normalize_formatting_rules(raw_rules)
 
-      @rules = default_formatting_rules.merge(@rules)
+      @rules = default_formatting_rules.merge(@rules) unless @rules[:ignore_defaults]
       @rules = localize_formatting_rules(@rules)
       @rules = translate_formatting_rules(@rules) if @rules[:translate]
+      @rules[:format] ||= determine_format_from_formatting_rules(@rules)
     end
 
     def [](key)
@@ -52,7 +53,7 @@ class Money
 
     def translate_formatting_rules(rules)
       begin
-        rules[:symbol] = I18n.t currency.iso_code, :scope => "number.currency.symbol", :raise => true
+        rules[:symbol] = I18n.t currency.iso_code, scope: "number.currency.symbol", raise: true
       rescue I18n::MissingTranslationData
         # Do nothing
       end
@@ -66,6 +67,30 @@ class Money
         rules[:symbol_after_without_space] = true
       end
       rules
+    end
+
+    def determine_format_from_formatting_rules(rules)
+      symbol_position = symbol_position_from(rules)
+
+      if symbol_position == :before
+        rules.fetch(:symbol_before_without_space, true) ? '%u%n' : '%u %n'
+      else
+        rules[:symbol_after_without_space] ? '%n%u' : '%n %u'
+      end
+    end
+
+    def symbol_position_from(rules)
+      if rules.has_key?(:symbol_position)
+        if [:before, :after].include?(rules[:symbol_position])
+          return rules[:symbol_position]
+        else
+          raise ArgumentError, ":symbol_position must be ':before' or ':after'"
+        end
+      elsif currency.symbol_first?
+        :before
+      else
+        :after
+      end
     end
   end
 end

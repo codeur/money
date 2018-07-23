@@ -1,5 +1,23 @@
 # Changelog
 
+## 6.12.0
+- Remove caching of `.empty`/`.zero`
+- Preserve assigned bank when rounding
+- Always round the fractional part when calling `#round`
+- Wrap all amount parts when `:html_wrap` option is used
+- Deprecate `#currency_as_string` and `#currency_as_string=` (in favour of `#with_currency`)
+- Add `#with_currency` for swapping the currency
+- Rewrite allocate/split (fixing some penny loosing issues)
+
+## 6.11.3
+- Fix regression: if enabled use i18n locales in Money#to_s
+
+## 6.11.2
+- Fix regression: ignore formatting defaults for Money#to_s
+
+## 6.11.1
+- Fix issue with adding non-USD money to zero (used when calling `.sum` on an array)
+
 ## 6.11.0
 - Support i18n 1.0
 - Update yard dependency to 0.9.11
@@ -174,7 +192,7 @@
 - Works on Ruby 1.8.7
 - Update deps
 - Depreciate Money.parse
-- Passing :symbol => false when formatting 'JPY' currency in :ja locale
+- Passing symbol: false when formatting 'JPY' currency in :ja locale
   will work as expected
 - Divide now obeys the specified rounding mode
 - Add Money#round method. This is helpful when working in infinite_precision mode and would like to perform rounding at specific points in your work flow.
@@ -357,7 +375,7 @@ Features
 
 Bugfixes
 --------
- - Fixed issue with #format(:no_cents => true) (thanks Romain & Julien)
+ - Fixed issue with #format(no_cents: true) (thanks Romain & Julien)
 
 Money 3.5.5
 ===========
@@ -444,7 +462,7 @@ Features
  - Deprecated `Money#format` with separate params instead of Hash. Deprecation
    target set to Money 3.5.0.
    ([#issue/31](http://github.com/RubyMoney/money/issues/31))
- - Deprecated `Money#new(0, :currency => "EUR")` in favor of
+ - Deprecated `Money#new(0, currency: "EUR")` in favor of
    `Money#new(0, "EUR")`. Deprecation target set to Money 3.5.0.
    ([#issue/31](http://github.com/RubyMoney/money/issues/31))
  - Throw ArgumentError when trying to multiply two Money objects together.
