@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.description = "A Ruby Library for dealing with money and currency conversion."
   s.license     = "MIT"
 
-  s.add_dependency 'i18n', [">= 0.6.4", '< 1.1']
+  s.add_dependency 'i18n', [">= 0.6.4", '<= 1.1']
 
   s.add_development_dependency "bundler", "~> 1.3"
   s.add_development_dependency "rake"
@@ -26,4 +26,10 @@ Gem::Specification.new do |s|
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.test_files    = s.files.grep(%r{^(test|spec|features)/})
   s.require_paths = ["lib"]
+
+  if s.respond_to?(:metadata)
+    s.metadata['changelog_uri'] = 'https://github.com/RubyMoney/money/blob/master/CHANGELOG.md'
+    s.metadata['source_code_uri'] = 'https://github.com/RubyMoney/money/'
+    s.metadata['bug_tracker_uri'] = 'https://github.com/RubyMoney/money/issues'
+  end
 end

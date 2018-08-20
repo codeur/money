@@ -170,13 +170,13 @@ class Money
         key = curr.fetch(:iso_code).downcase.to_sym
         @@mutex.synchronize { _instances.delete(key.to_s) }
         @table[key] = curr
-        @stringified_keys = stringify_keys
+        @stringified_keys = nil
       end
 
       # Inherit a new currency from existing one
       #
       # @param parent_iso_code [String] the international 3-letter code as defined
-      # @param curr [Hash] See {register} method for hash structure 
+      # @param curr [Hash] See {register} method for hash structure
       def inherit(parent_iso_code, curr)
         parent_iso_code = parent_iso_code.downcase.to_sym
         curr = @table.fetch(parent_iso_code, {}).merge(curr)
@@ -197,10 +197,9 @@ class Money
           key = curr.downcase.to_sym
         end
         existed = @table.delete(key)
-        @stringified_keys = stringify_keys if existed
+        @stringified_keys = nil if existed
         existed ? true : false
       end
-
 
       def each
         all.each { |c| yield(c) }
@@ -399,6 +398,17 @@ class Money
 
     def symbol_first?
       !!@symbol_first
+    end
+
+    # Returns if a code currency is ISO.
+    #
+    # @return [Boolean]
+    #
+    # @example
+    #   Money::Currency.new(:usd).iso?
+    #
+    def iso?
+      iso_numeric && iso_numeric != ''
     end
 
     # Returns the relation between subunit and unit as a base 10 exponent.
