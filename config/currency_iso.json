@@ -1412,9 +1412,9 @@
     "iso_numeric": "446",
     "smallest_denomination": 10
   },
-  "mro": {
+  "mru": {
     "priority": 100,
-    "iso_code": "MRO",
+    "iso_code": "MRU",
     "name": "Ouguiya mauritanien",
     "symbol": "UM",
     "alternate_symbols": [],
@@ -1424,7 +1424,7 @@
     "html_entity": "",
     "decimal_mark": ".",
     "thousands_separator": ",",
-    "iso_numeric": "478",
+    "iso_numeric": "929",
     "smallest_denomination": 1
   },
   "mur": {
@@ -1647,12 +1647,12 @@
     "priority": 100,
     "iso_code": "PEN",
     "name": "Sol péruvien",
-    "symbol": "S/.",
+    "symbol": "S/",
     "alternate_symbols": [],
     "subunit": "Céntimo",
     "subunit_to_unit": 100,
     "symbol_first": true,
-    "html_entity": "S/.",
+    "html_entity": "S/",
     "decimal_mark": ".",
     "thousands_separator": ",",
     "iso_numeric": "604",
@@ -2260,7 +2260,7 @@
     "priority": 100,
     "iso_code": "UZS",
     "name": "Sum ouzbek",
-    "symbol": "",
+    "symbol": "so'm",
     "alternate_symbols": ["so‘m", "сўм", "сум", "s", "с"],
     "subunit": "Tiyin",
     "subunit_to_unit": 100,
@@ -2271,19 +2271,19 @@
     "iso_numeric": "860",
     "smallest_denomination": 100
   },
-  "vef": {
+  "ves": {
     "priority": 100,
-    "iso_code": "VEF",
+    "iso_code": "VES",
     "name": "Bolivar vénézuélien",
     "symbol": "Bs",
-    "alternate_symbols": ["Bs.F"],
+    "alternate_symbols": ["Bs.S"],
     "subunit": "Céntimo",
     "subunit_to_unit": 100,
     "symbol_first": true,
     "html_entity": "",
     "decimal_mark": ",",
     "thousands_separator": ".",
-    "iso_numeric": "937",
+    "iso_numeric": "928",
     "smallest_denomination": 1
   },
   "vnd": {
@@ -2594,12 +2594,12 @@
     "priority": 100,
     "iso_code": "ZMW",
     "name": "Kwacha zambien",
-    "symbol": "ZK",
+    "symbol": "K",
     "disambiguate_symbol": "ZMW",
     "alternate_symbols": [],
     "subunit": "Ngwee",
     "subunit_to_unit": 100,
-    "symbol_first": false,
+    "symbol_first": true,
     "html_entity": "",
     "decimal_mark": ".",
     "thousands_separator": ",",

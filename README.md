@@ -21,7 +21,7 @@ A Ruby Library for dealing with money and currency conversion.
 
 ### Features
 
-- Provides a `Money` class which encapsulates all information about an certain
+- Provides a `Money` class which encapsulates all information about a certain
   amount of money, such as its value and its currency.
 - Provides a `Money::Currency` class which encapsulates all information about
   a monetary unit.
@@ -253,7 +253,7 @@ The default bank is initialized with an in-memory store for exchange rates.
 Money.default_bank = Money::Bank::VariableExchange.new(Money::RatesStore::Memory.new)
 ```
 
-You can pass you own store implementation, ie. for storing and retrieving rates off a database, file, cache, etc.
+You can pass your own store implementation, i.e. for storing and retrieving rates off a database, file, cache, etc.
 
 ```ruby
 Money.default_bank = Money::Bank::VariableExchange.new(MyCustomStore.new)
@@ -270,7 +270,7 @@ Stores must implement the following interface:
 # @return [Numeric] rate.
 def add_rate(iso_from, iso_to, rate); end
 
-# Get rate. Must be idempotent. ie. adding the same rate must not produce duplicates.
+# Get rate. Must be idempotent. i.e. adding the same rate must not produce duplicates.
 # @param [String] iso_from Currency ISO code. ex. 'USD'
 # @param [String] iso_to Currency ISO code. ex. 'CAD'
 #
@@ -334,6 +334,8 @@ end
 Now you can use it with the default bank.
 
 ```ruby
+# For Rails 6 pass model name as a string to make it compatible with zeitwerk
+# Money.default_bank = Money::Bank::VariableExchange.new("ExchangeRate")
 Money.default_bank = Money::Bank::VariableExchange.new(ExchangeRate)
 
 # Add to the underlying store
@@ -392,6 +394,42 @@ m = Money.new('123', :gbp) # => #<Money fractional:123 currency:GBP>
 m.format(symbol: m.currency.to_s + ' ') # => "GBP 1.23"
 ```
 
+## Rounding
+
+By default, `Money` objects are rounded to the nearest cent and the additional precision is not preserved:
+
+```ruby
+Money.from_amount(2.34567).format #=> "$2.35"
+```
+
+To retain the additional precision, you will also need to set `infinite_precision` to `true`.
+
+```ruby
+Money.infinite_precision = true
+Money.from_amount(2.34567).format #=> "$2.34567"
+```
+
+To round to the nearest cent (or anything more precise), you can use the `round` method. However, note that the `round` method on a `Money` object does not work the same way as a normal Ruby `Float` object. Money's `round` method accepts different arguments. The first argument to the round method is the rounding mode, while the second argument is the level of precision relative to the cent.
+
+```
+# Float
+2.34567.round     #=> 2
+2.34567.round(2)  #=> 2.35
+
+# Money
+Money.infinite_precision = true
+Money.new(2.34567).format       #=> "$0.0234567"
+Money.new(2.34567).round.format #=> "$0.02"
+Money.new(2.34567).round(BigDecimal::ROUND_HALF_UP, 2).format #=> "$0.0235"
+```
+
+You can set the default rounding mode by passing one of the `BigDecimal` mode enumerables like so:
+```ruby
+Money.rounding_mode = BigDecimal::ROUND_HALF_EVEN
+```
+See [BigDecimal::ROUND_MODE](https://ruby-doc.org/stdlib-2.5.1/libdoc/bigdecimal/rdoc/BigDecimal.html#ROUND_MODE) for more information
+
+
 ## Ruby on Rails
 
 To integrate money in a Rails application use [money-rails](https://github.com/RubyMoney/money-rails).
@@ -432,6 +470,48 @@ If you wish to disable this feature and use defaults instead:
 
 ``` ruby
 Money.locale_backend = nil
+```
+
+### Deprecation
+
+The current default behaviour always checks the I18n locale first, falling back to "per currency"
+localization. This is now deprecated and will be removed in favour of explicitly defined behaviour
+in the next major release.
+
+If you would like to use I18n localization (formatting depends on the locale):
+
+```ruby
+Money.locale_backend = :i18n
+
+# example (using default localization from rails-i18n):
+I18n.locale = :en
+Money.new(10_000_00, 'USD').format # => $10,000.00
+Money.new(10_000_00, 'EUR').format # => €10,000.00
+
+I18n.locale = :es
+Money.new(10_000_00, 'USD').format # => $10.000,00
+Money.new(10_000_00, 'EUR').format # => €10.000,00
+```
+
+For the legacy behaviour of "per currency" localization (formatting depends only on currency):
+
+```ruby
+Money.locale_backend = :currency
+
+# example:
+Money.new(10_000_00, 'USD').format # => $10,000.00
+Money.new(10_000_00, 'EUR').format # => €10.000,00
+```
+
+In case you don't need localization and would like to use default values (can be redefined using
+`Money.default_formatting_rules`):
+
+```ruby
+Money.locale_backend = nil
+
+# example:
+Money.new(10_000_00, 'USD').format # => $10000.00
+Money.new(10_000_00, 'EUR').format # => €10000.00
 ```
 
 ## Collection

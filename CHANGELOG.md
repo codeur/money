@@ -1,5 +1,58 @@
 # Changelog
 
+## 6.13.7
+- Improve deprecation warnings for the upcoming major release
+
+## 6.13.6
+- Fix a regression introduced in 6.13.5 that broken RatesStore::Memory subclasses
+
+## 6.13.5
+- Raise warning on using Money.default_currency
+- Raise warning on using default Money.rounding_mode
+- Add Second Ouguiya MRU 929 to currency iso file
+- Add symbol for UZS
+- Use monitor for recursive mutual exclusion in RatesStore::Memory
+- Allow passing store as a string to Money::Bank::VariableExchange (to support Rails 6)
+
+## 6.13.4
+- Update currency config for Zambian Kwacha (ZMW)
+- Do not modify options passed to FormattingRules
+
+## 6.13.3
+- Remove specs from the packaged gem
+- Use Currency::Loader directly without extending
+- Add Money.with_rounding_mode as a replacement for calling Money.rounding_mode with a block
+- Fix currency search for two digit ISO numbers
+- Add description to TypeError raised by +/- operations
+
+## 6.13.2
+- Prevent Money initialization with non-finite amounts
+- Convert the fractional value of a Money object to BigDecimal when initializing
+- Offer replacements for currency position deprecations
+- Fix Peruvian Sol symbol
+- Lock i18n to <= 1.2.0 for older (< 2.3) rubies
+- Prevent Divide By Zero in `Money#allocate`
+
+## 6.13.1
+- Add bolívar soberano (VES)
+- Deprecate bolívar fuerte (VEF)
+- Deprecate old `#format` rules passed as a symbol
+- Clarify `use_i18n` deprecation
+- Add `:currency` locale_backend for explicit per-currency localization
+
+## 6.13.0
+- Add :format option to the Formatter
+- Add ruby 2.6.0 support
+- Performance improvement (lazy stringify currency keys)
+- Add `Money.locale_backend` for translation lookups
+- Deprecate `use_i18n` flag in favour of `locale_backend = :i18n`
+- Deprecate old formatting rules in favour of `:format`
+- LVL and LTL are no longer used
+- Add `Currency#iso?` for checking if currency is iso or not
+- Relax versions-lock of `i18n` and `rspec` dependencies
+- Add Bitcoin Cash
+- Fix incorrect behaviour of `Currency#find_by_currency_iso` when given empty input
+
 ## 6.12.0
 - Remove caching of `.empty`/`.zero`
 - Preserve assigned bank when rounding
@@ -7,7 +60,7 @@
 - Wrap all amount parts when `:html_wrap` option is used
 - Deprecate `#currency_as_string` and `#currency_as_string=` (in favour of `#with_currency`)
 - Add `#with_currency` for swapping the currency
-- Rewrite allocate/split (fixing some penny loosing issues)
+- Rewrite allocate/split (fixing some penny losing issues)
 
 ## 6.11.3
 - Fix regression: if enabled use i18n locales in Money#to_s
@@ -26,7 +79,7 @@
 - Added new symbol for bitcoin denomination
 - Specify custom rounding precision when using `infinite_precision`
 - Allow splits with sums greater than 1
-- Prevent arithmetic methods from loosing reference to the bank
+- Prevent arithmetic methods from losing reference to the bank
 - Fix coerced zero numeric subtraction
 - Fix south asian formatting to support whole numbers
 - Refactor formatting logic

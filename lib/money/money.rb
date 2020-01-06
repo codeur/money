@@ -91,51 +91,62 @@ class Money
   class << self
 
     # @!attribute [rw] default_bank
-    #   @return [Money::Bank::Base] Each Money object is associated to a bank
-    #     object, which is responsible for currency exchange. This property
-    #     allows you to specify the default bank object. The default value for
-    #     this property is an instance of +Bank::VariableExchange.+ It allows
-    #     one to specify custom exchange rates.
+    #   Used to set a default bank for currency exchange.
+    #
+    #   Each Money object is associated with a bank
+    #   object, which is responsible for currency exchange. This property
+    #   allows you to specify the default bank object. The default value for
+    #   this property is an instance of +Bank::VariableExchange.+ It allows
+    #   one to specify custom exchange rates.
+    #
+    #   @return [Money::Bank::Base]
     #
     # @!attribute default_formatting_rules
-    #   @return [Hash] Use this to define a default hash of rules for every time
-    #     +Money#format+ is called.  Rules provided on method call will be
-    #     merged with the default ones.  To overwrite a rule, just provide the
-    #     intended value while calling +format+.
+    #   Used to define a default hash of rules for every time
+    #   +Money#format+ is called.  Rules provided on method call will be
+    #   merged with the default ones.  To overwrite a rule, just provide the
+    #   intended value while calling +format+.
     #
-    #   @see +Money::Formatting#format+ for more details.
+    #   @see Money::Formatter#initialize Money::Formatter for more details
     #
     #   @example
     #     Money.default_formatting_rules = { display_free: true }
     #     Money.new(0, "USD").format                          # => "free"
     #     Money.new(0, "USD").format(display_free: false)  # => "$0.00"
     #
+    #   @return [Hash]
+    #
     # @!attribute [rw] use_i18n
-    #   @return [Boolean] Use this to disable i18n even if it's used by other
-    #     objects in your app.
+    #   Used to disable i18n even if it's used by other components of your app.
+    #
+    #   @return [Boolean]
     #
     # @!attribute [rw] infinite_precision
-    #   @return [Boolean] Use this to enable infinite precision cents
+    #   Used to enable infinite precision cents
+    #
+    #   @return [Boolean]
     #
     # @!attribute [rw] conversion_precision
-    #   @return [Integer] Use this to specify precision for converting Rational
-    #     to BigDecimal
+    #   Used to specify precision for converting Rational to BigDecimal
+    #
+    #   @return [Integer]
     attr_accessor :default_bank, :default_formatting_rules,
       :use_i18n, :infinite_precision, :conversion_precision,
       :locale_backend
-
-    # @attr_writer rounding_mode Use this to specify the rounding mode
-    #
-    # @!attribute default_currency
-    #   @return [Money::Currency] The default currency, which is used when
-    #     +Money.new+ is called without an explicit currency argument. The
-    #     default value is Currency.new("USD"). The value must be a valid
-    #     +Money::Currency+ instance.
-    attr_writer :rounding_mode, :default_currency
-
   end
 
+  # @!attribute default_currency
+  #   @return [Money::Currency] The default currency, which is used when
+  #     +Money.new+ is called without an explicit currency argument. The
+  #     default value is Currency.new("USD"). The value must be a valid
+  #     +Money::Currency+ instance.
   def self.default_currency
+    if @using_deprecated_default_currency
+      warn '[WARNING] The default currency will change from `USD` to `nil` in the next major release. Make ' \
+           'sure to set it explicitly using `Money.default_currency=` to avoid potential issues'
+      @using_deprecated_default_currency = false
+    end
+
     if @default_currency.respond_to?(:call)
       Money::Currency.new(@default_currency.call)
     else
@@ -143,13 +154,26 @@ class Money
     end
   end
 
+  def self.default_currency=(currency)
+    @using_deprecated_default_currency = false
+    @default_currency = currency
+  end
+
   def self.locale_backend=(value)
     @locale_backend = value ? LocaleBackend.find(value) : nil
   end
 
+  # @attr_writer rounding_mode Use this to specify the rounding mode
+  def self.rounding_mode=(new_rounding_mode)
+    @using_deprecated_default_rounding_mode = false
+    @rounding_mode = new_rounding_mode
+  end
+
   def self.use_i18n=(value)
     if value
-      warn '[DEPRECATION] `use_i18n` is deprecated - use `Money.locale_backend = :i18n` instead'
+      warn '[DEPRECATION] `use_i18n` is deprecated - use `Money.locale_backend = :i18n` instead for locale based formatting'
+    else
+      warn '[DEPRECATION] `use_i18n` is deprecated - use `Money.locale_backend = :currency` instead for currency based formatting'
     end
 
     @use_i18n = value
@@ -161,6 +185,7 @@ class Money
 
     # Set the default currency for creating new +Money+ object.
     self.default_currency = Currency.new("USD")
+    @using_deprecated_default_currency = true
 
     # Default to using i18n
     @use_i18n = true
@@ -173,6 +198,7 @@ class Money
 
     # Default to bankers rounding
     self.rounding_mode = BigDecimal::ROUND_HALF_EVEN
+    @using_deprecated_default_rounding_mode = true
 
     # Default the conversion of Rationals precision to 16
     self.conversion_precision = 16
@@ -184,31 +210,47 @@ class Money
 
   setup_defaults
 
-  # Use this to return the rounding mode.  You may also pass a
-  # rounding mode and a block to temporarily change it.  It will
-  # then return the results of the block instead.
+  # Use this to return the rounding mode.
   #
   # @param [BigDecimal::ROUND_MODE] mode
   #
-  # @return [BigDecimal::ROUND_MODE,Yield] rounding mode or block results
-  #
-  # @example
-  #   fee = Money.rounding_mode(BigDecimal::ROUND_HALF_UP) do
-  #     Money.new(1200) * BigDecimal('0.029')
-  #   end
+  # @return [BigDecimal::ROUND_MODE] rounding mode
   def self.rounding_mode(mode = nil)
-    if mode.nil?
-      Thread.current[:money_rounding_mode] || @rounding_mode
-    else
-      begin
-        Thread.current[:money_rounding_mode] = mode
-        yield
-      ensure
-        Thread.current[:money_rounding_mode] = nil
-      end
+    if mode
+      warn "[DEPRECATION] calling `rounding_mode` with a block is deprecated. Please use `.with_rounding_mode` instead."
+      return with_rounding_mode(mode) { yield }
     end
+
+    return Thread.current[:money_rounding_mode] if Thread.current[:money_rounding_mode]
+
+    if @using_deprecated_default_rounding_mode
+      warn '[WARNING] The default rounding mode will change from `ROUND_HALF_EVEN` to `ROUND_HALF_UP` in the ' \
+           'next major release. Set it explicitly using `Money.rounding_mode=` to avoid potential problems.'
+      @using_deprecated_default_rounding_mode = false
+    end
+
+    @rounding_mode
   end
 
+  # Temporarily changes the rounding mode in a given block.
+  #
+  # @param [BigDecimal::ROUND_MODE] mode
+  #
+  # @yield The block within which rounding mode will be changed. Its return
+  #   value will also be the return value of the whole method.
+  #
+  # @return [Object] block results
+  #
+  # @example
+  #   fee = Money.with_rounding_mode(BigDecimal::ROUND_HALF_UP) do
+  #     Money.new(1200) * BigDecimal('0.029')
+  #   end
+  def self.with_rounding_mode(mode)
+    Thread.current[:money_rounding_mode] = mode
+    yield
+  ensure
+    Thread.current[:money_rounding_mode] = nil
+  end
 
   # Adds a new exchange rate to the default bank and return the rate.
   #
@@ -274,10 +316,13 @@ class Money
   #   Money.new(100, "EUR") #=> #<Money @fractional=100 @currency="EUR">
   #
   def initialize(obj, currency = Money.default_currency, bank = Money.default_bank)
-    @fractional = obj.respond_to?(:fractional) ? obj.fractional : as_d(obj)
+    @fractional = as_d(obj.respond_to?(:fractional) ? obj.fractional : obj)
     @currency   = obj.respond_to?(:currency) ? obj.currency : Currency.wrap(currency)
     @currency ||= Money.default_currency
     @bank       = obj.respond_to?(:bank) ? obj.bank : bank
+
+    # BigDecimal can be Infinity and NaN, money of that amount does not make sense
+    raise ArgumentError, 'must be initialized with a finite value' unless @fractional.finite?
   end
 
   # Assuming using a currency using dollars:
@@ -500,13 +545,15 @@ class Money
     exchange_to("EUR")
   end
 
-  # Splits a given amount in parts without loosing pennies. The left-over pennies will be
-  # distributed round-robin amongst the parties. This means that parties listed first will likely
-  # receive more pennies than ones that are listed later.
+  # Splits a given amount in parts without losing pennies. The left-over pennies will be
+  # distributed round-robin amongst the parties. This means that parts listed first will likely
+  # receive more pennies than ones listed later.
   #
-  # @param [Array<Numeric>, Numeric] pass [2, 1, 1] to give twice as much to party1 as party2 or
-  # party3 which results in 50% of the cash to party1, 25% to party2, and 25% to party3. Passing a
-  # number instead of an array will split the amount evenly (without loosing pennies when rounding).
+  # Pass [2, 1, 1] as input to give twice as much to part1 as part2 or
+  # part3 which results in 50% of the cash to party1, 25% to part2, and 25% to part3. Passing a
+  # number instead of an array will split the amount evenly (without losing pennies when rounding).
+  #
+  # @param [Array<Numeric>, Numeric] parts how amount should be distributed to parts
   #
   # @return [Array<Money>]
   #
@@ -544,7 +591,7 @@ class Money
 
   # Creates a formatted price string according to several rules.
   #
-  # @param [Hash] See Money::Formatter for the list of formatting options
+  # @param [Hash] rules See {Money::Formatter Money::Formatter} for the list of formatting options
   #
   # @return [String]
   #

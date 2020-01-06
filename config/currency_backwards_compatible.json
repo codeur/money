@@ -60,6 +60,22 @@
     "iso_numeric": "428",
     "smallest_denomination": 1
   },
+  "mro": {
+    "priority": 100,
+    "iso_code": "MRO",
+    "name": "Ouguiya mauritanien",
+    "symbol": "UM",
+    "disambiguate_symbol": "A-UM",
+    "alternate_symbols": [],
+    "subunit": "Khoums",
+    "subunit_to_unit": 5,
+    "symbol_first": false,
+    "html_entity": "",
+    "decimal_mark": ".",
+    "thousands_separator": ",",
+    "iso_numeric": "478",
+    "smallest_denomination": 1
+  },
   "mtl": {
     "priority": 100,
     "iso_code": "MTL",
@@ -169,5 +185,20 @@
     "thousands_separator": ",",
     "iso_numeric": "935",
     "smallest_denomination": 100
+  },
+  "vef": {
+    "priority": 100,
+    "iso_code": "VEF",
+    "name": "Bolivar vénézuélien",
+    "symbol": "Bs.F",
+    "alternate_symbols": ["Bs"],
+    "subunit": "Céntimo",
+    "subunit_to_unit": 100,
+    "symbol_first": true,
+    "html_entity": "",
+    "decimal_mark": ",",
+    "thousands_separator": ".",
+    "iso_numeric": "937",
+    "smallest_denomination": 1
   }
 }
